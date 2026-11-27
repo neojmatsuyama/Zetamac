@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Zetamac</title>
+  <meta name="description" content="Timed mental arithmetic practice">
+  <meta name="theme-color" content="#111418">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Zetamac">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Settings -->
+  <section id="screen-settings" class="screen active" aria-label="Settings">
+    <header class="title-bar">
+      <h1>Arithmetic Game</h1>
+      <button id="btn-history" class="link-btn" type="button">History</button>
+    </header>
+
+    <div class="settings-scroll">
+      <div class="op-card">
+        <label class="op-head"><input type="checkbox" id="op-add" checked> Addition</label>
+        <div class="range">
+          (<input type="number" inputmode="numeric" id="add-a-min" value="2"> to <input type="number" inputmode="numeric" id="add-a-max" value="100">)
+          +
+          (<input type="number" inputmode="numeric" id="add-b-min" value="2"> to <input type="number" inputmode="numeric" id="add-b-max" value="100">)
+        </div>
+      </div>
+
+      <div class="op-card">
+        <label class="op-head"><input type="checkbox" id="op-sub" checked> Subtraction</label>
+        <div class="range muted">Addition problems in reverse.</div>
+      </div>
+
+      <div class="op-card">
+        <label class="op-head"><input type="checkbox" id="op-mul" checked> Multiplication</label>
+        <div class="range">
+          (<input type="number" inputmode="numeric" id="mul-a-min" value="2"> to <input type="number" inputmode="numeric" id="mul-a-max" value="12">)
+          ×
+          (<input type="number" inputmode="numeric" id="mul-b-min" value="2"> to <input type="number" inputmode="numeric" id="mul-b-max" value="100">)
+        </div>
+      </div>
+
+      <div class="op-card">
+        <label class="op-head"><input type="checkbox" id="op-div" checked> Division</label>
+        <div class="range muted">Multiplication problems in reverse.</div>
+      </div>
+
+      <div class="op-card row">
+        <label for="duration">Duration</label>
+        <select id="duration">
+          <option value="30">30 seconds</option>
+          <option value="60">60 seconds</option>
+          <option value="120" selected>120 seconds</option>
+          <option value="300">300 seconds</option>
+          <option value="600">600 seconds</option>
+        </select>
+      </div>
+
+      <div class="op-card row">
+        <label for="opt-haptics">Haptics &amp; flash on correct</label>
+        <input type="checkbox" id="opt-haptics" checked>
+      </div>
+
+      <p id="settings-error" class="error" role="alert"></p>
+      <div class="best-line" id="settings-best"></div>
+      <button id="btn-defaults" class="link-btn small" type="button">Restore defaults</button>
+    </div>
+
+    <div class="bottom-bar">
+      <button id="btn-start" class="primary" type="button">Start</button>
+    </div>
+  </section>
+
+  <!-- Game -->
+  <section id="screen-game" class="screen" aria-label="Game">
+    <div class="status">
+      <span>Seconds left: <b id="time-left">120</b></span>
+      <button id="btn-quit" class="link-btn small" type="button" aria-label="Quit">✕</button>
+      <span>Score: <b id="score">0</b></span>
+    </div>
+    <div class="problem-area" id="problem-area">
+      <div class="problem" id="problem" aria-live="polite">2 + 2</div>
+      <div class="answer" id="answer"><span class="caret"></span></div>
+    </div>
+    <div class="keypad" id="keypad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="C" class="fn">C</button><button data-k="0">0</button><button data-k="B" class="fn" aria-label="Delete">⌫</button>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="screen-end" class="screen" aria-label="Results">
+    <div class="end-wrap">
+      <div class="end-score">Score: <span id="final-score">0</span></div>
+      <div id="end-badge" class="badge"></div>
+      <div class="end-stats" id="end-stats"></div>
+      <div class="end-actions">
+        <button id="btn-again" class="primary" type="button">Try again</button>
+        <button id="btn-change" class="secondary" type="button">Change settings</button>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Recent scores (these settings)</div>
+        <svg id="chart" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section id="screen-history" class="screen" aria-label="History">
+    <header class="title-bar">
+      <button id="btn-history-back" class="link-btn" type="button">‹ Back</button>
+      <h1>History</h1>
+      <button id="btn-history-clear" class="link-btn danger" type="button">Clear</button>
+    </header>
+    <div class="settings-scroll" id="history-list"></div>
+  </section>
+
+  <!-- Hidden iOS haptic trigger (Safari 17.4+ switch control) -->
+  <label id="haptic-label" class="haptic" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
+
+  <script src="app.js"></script>
+</body>
+</html>
